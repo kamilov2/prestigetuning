@@ -28,15 +28,6 @@ SECRET_KEY = 'django-insecure-_bm*%ivm*y73kfr7(7js3uk0hexl2=2d9#jcn4u6h4xbd2m5g_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
-    'DISABLE_PANELS': (
-        'debug_toolbar.panels.redirects.RedirectsPanel',
-        'debug_toolbar.panels.profiling.ProfilingPanel',
-    ),
-    'JQUERY_URL': '', 
-}
-
 
 ALLOWED_HOSTS = ['*']
 
@@ -132,7 +123,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  
     "http://127.0.0.1:8000",   
     "http://localhost:5000",
-    "http://*"   
+    "http://*",
+    "https://*",  
 
 ]
 
