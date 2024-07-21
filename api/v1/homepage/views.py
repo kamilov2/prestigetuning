@@ -1,3 +1,4 @@
+import telebot
 from rest_framework import viewsets, views, status
 from main.models import Banner, Category, Product
 from rest_framework.authentication import TokenAuthentication
@@ -5,6 +6,10 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from django.db.models import Prefetch, Count, Avg
 from .serializers import BannerSerializer, CategorySerializer, TopSellingProductsSerializer, RecommendedProductsSerializer, ContactSerializer
+
+
+bot = telebot.TeleBot('6704792126:AAGpqxtc36goOtl62kKQpCSXEzp9d2sQ-iY')
+
 class BannerViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     serializer_class = BannerSerializer
@@ -55,7 +60,12 @@ class ContactAPIView(views.APIView):
         if serializer.is_valid():
             name = serializer.validated_data.get('name')
             phone_number = serializer.validated_data.get('phone')
-            
+            message_text = (
+                f"<b>#Bog'lanish:</b>\n\n"
+                f"<b>Ism:</b> {name}\n"
+                f"<b>Telefon raqami:</b> +{phone_number}\n"
+            )
+            bot.send_message('-1002165196907', message_text, parse_mode='html')
 
             return Response({"message": "Tez orada siz bilan bo'g'lanamiz"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
