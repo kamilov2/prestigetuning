@@ -3,9 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from decimal import Decimal, InvalidOperation
-from main.models import Order, OrderItem,Product
+from main.models import Order, OrderItem, Product
 
 bot = telebot.TeleBot('6704792126:AAGpqxtc36goOtl62kKQpCSXEzp9d2sQ-iY')
+
 class OrderViewSet(APIView):
     def post(self, request):
         full_name = request.data.get('full_name')
@@ -17,6 +18,7 @@ class OrderViewSet(APIView):
         delivery_status = request.data.get('delivery_status')
         message_for_delivery = request.data.get('message_for_delivery')
         items = request.data.get('items')
+
         if delivery_status:
             message_text = (
                 f"<b>#dostavka:</b>\n\n"
@@ -67,35 +69,34 @@ class OrderViewSet(APIView):
             
             message_text += (
                 f"- {product.name}: {quantity} x {usd_price} USD = {total_item_usd} USD "
-                f"/ {quantity} x {uzs_price} UZS = {total_item_uzs} UZS\n"
+                f"| {quantity} x {uzs_price} UZS = {total_item_uzs} UZS\n"
             )
             total_usd += total_item_usd
             total_uzs += total_item_uzs
 
-            message_text += f"\n<b>Umumiy summa:</b> {total_usd:,.2f} USD / {total_uzs:,.2f} UZS"
+        message_text += f"\n<b>Umumiy summa:</b> {total_usd:,.2f} USD / {total_uzs:,.2f} UZS"
 
-            bot.send_message('-1002165196907', message_text, parse_mode='HTML')
+        bot.send_message('-1002165196907', message_text, parse_mode='HTML')
 
-            order = Order.objects.create(
-                full_name=full_name,
-                phone_number=phone_number,
-                city=city if delivery_status else 'none',
-                village=village if delivery_status else 'none',
-                street=street if delivery_status else 'none',
-                home_number=home_number if delivery_status else 'none',
-                delivery_status=delivery_status,
-                message_for_delivery=message_for_delivery,
-            )
+        order = Order.objects.create(
+            full_name=full_name,
+            phone_number=phone_number,
+            city=city if delivery_status else 'none',
+            village=village if delivery_status else 'none',
+            street=street if delivery_status else 'none',
+            home_number=home_number if delivery_status else 'none',
+            delivery_status=delivery_status,
+            message_for_delivery=message_for_delivery,
+        )
 
-            for item in items:
-                product = product_dict.get(item['id'])
-                if product:
-                    OrderItem.objects.create(
-                        order=order,
-                        product=product,
-                        price=product.uzs_price or Decimal('0.00'),
-                        quantity=item['quantity']
-                    )
+        for item in items:
+            product = product_dict.get(item['id'])
+            if product:
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    price=product.uzs_price or Decimal('0.00'),
+                    quantity=item['quantity']
+                )
 
         return Response({'success': 'Order created successfully'}, status=status.HTTP_201_CREATED)
-            

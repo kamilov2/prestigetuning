@@ -28,7 +28,7 @@ class ProductViewSet(viewsets.ViewSet):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.filter(count_in_stock__gt=0)
+        queryset = Product.objects.all()  # Removed the filter for count_in_stock
         
         params = {
             'category_id': 'category__id',
@@ -57,7 +57,6 @@ class ProductViewSet(viewsets.ViewSet):
         serializer = self.serializer_class(page, many=True, context={'request': request}) if page is not None else self.serializer_class(queryset, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data) if page is not None else Response(serializer.data)
 
-
     @action(detail=False, methods=['get'])
     def all_data(self, request):
         categories = Category.objects.all()[:6]
@@ -73,7 +72,7 @@ class ProductViewSet(viewsets.ViewSet):
             'brands': brand_serializer.data,
             'car_models': car_model_serializer.data
         })
- 
+
 class ProductDetailViewSet(viewsets.ViewSet):
     authentication_classes = [TokenAuthentication]
     serializer_class = ProductDetailSerializer
@@ -98,7 +97,6 @@ class ProductDetailViewSet(viewsets.ViewSet):
         
         return Response({'detail': 'Product ID query parameter is required.'}, status=400)
 
-
 class SearchProductViewSet(viewsets.ViewSet):
     authentication_classes = [TokenAuthentication]
     serializer_class = ProductSerializer
@@ -109,7 +107,7 @@ class SearchProductViewSet(viewsets.ViewSet):
         queryset = Product.objects.filter(
             Q(name__icontains=search_text) | 
             Q(category__name__icontains=search_text)
-        ).select_related('category') 
+        ).select_related('category')
         
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request, view=self)
