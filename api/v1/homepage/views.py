@@ -19,7 +19,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]  
     serializer_class = CategorySerializer
     queryset = Category.objects.prefetch_related(
-        Prefetch('products', queryset=Product.objects.filter(count_in_stock__gt=0).select_related('brand', 'car_model'))
+        Prefetch('products', queryset=Product.objects.select_related('brand', 'car_model'))
     )
 
 class TopSellingProductsView(viewsets.ViewSet):
