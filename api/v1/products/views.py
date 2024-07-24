@@ -10,7 +10,7 @@ from main.models import Product, Category, Brand, CarModel
 
 class CustomPagination(PageNumberPagination):
     allow_empty_first_page = True
-    page_size = 1
+    page_size = 9
 
     def get_paginated_response(self, data):
         return Response({
